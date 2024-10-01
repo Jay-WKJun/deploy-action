@@ -13,6 +13,7 @@ async function run() {
     const baseBranch = pullRequest.base.ref;  // 머지 타겟 브랜치 (ex: main)
     console.log(`Current branch: ${baseBranch}`);
 
+    // 머지 하는 브랜치 정보 추출
     const headBranch = pullRequest.head.ref;  // 머지 하는 브랜치
     console.log(`Current branch: ${headBranch}`);
 
