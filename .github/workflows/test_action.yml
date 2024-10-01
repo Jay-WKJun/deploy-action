@@ -3,7 +3,7 @@ on:
   pull_request:
     types: [closed]  # PR이 닫힐 때 실행
     branches:
-      - main  # main 브랜치로 머지될 때만 실행
+      - test  # main 브랜치로 머지될 때만 실행
 
 jobs:
   merge-check:
