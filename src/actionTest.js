@@ -22,7 +22,7 @@ async function run() {
     await git.fetch(['origin', headBranch]);
 
     // 차이가 있는 커밋들 가져오기
-    const commitsDiff = await git.diffSummary([`${baseBranch}..${compareBranch}`]);
+    const commitsDiff = await git.diffSummary([`${baseBranch}..${headBranch}`]);
 
     console.log(`Commits between ${headBranch} and ${baseBranch}:`);
     commitsDiff.all.forEach(commit => {
