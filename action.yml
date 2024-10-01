@@ -1,0 +1,16 @@
+name: 'commit-sort-and-send-slack'
+description: 'sort merged commits in Specific branch & send to slack'
+inputs:
+  subscribe-branches : # branch names
+    description: 'Comma-separated list of branches where the action can run'
+    required: true
+    default: 'main'
+  channel-id: # channel id to post message when using bot token
+    description: 'Slack channel ID where message will be posted. Needed if using bot token'
+    required: true
+outputs:
+  sorted-commits:
+    description: 'Sorted commits'
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
