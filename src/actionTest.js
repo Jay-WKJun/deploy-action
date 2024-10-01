@@ -2,6 +2,8 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const simpleGit = require('simple-git');
 
+console.log('Hello World!');
+
 async function run() {
   try {
     const git = simpleGit();
@@ -15,8 +17,9 @@ async function run() {
 
     console.log(`Comparing changes between ${headBranch} and ${baseBranch}`);
 
-    // 두 브랜치 간의 커밋 차이 가져오기
-    await git.fetch();
+    // base와 head 브랜치 fetch
+    await git.fetch(['origin', baseBranch]);
+    await git.fetch(['origin', headBranch]);
 
     // 차이가 있는 커밋들 가져오기
     const commitsDiff = await git.log([`${baseBranch}..${headBranch}`]);
