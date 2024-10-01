@@ -18,7 +18,9 @@ async function run() {
     console.log(`Comparing changes between ${headBranch} and ${baseBranch}`);
 
     // base와 head 브랜치 fetch
+    await git.checkout(baseBranch);
     await git.fetch(['origin', baseBranch]);
+    await git.checkout(headBranch);
     await git.fetch(['origin', headBranch]);
 
     // 차이가 있는 커밋들 가져오기
