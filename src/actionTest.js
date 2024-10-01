@@ -15,10 +15,12 @@ async function run() {
 
     console.log(`Merging from branch: ${headBranch} to ${baseBranch}`);
 
+    // 원본 브랜치 fetch
+    await git.fetch(['origin', headBranch]);
+    // 원본 브랜치 checkout
+    await git.checkout(headBranch);
     // 원본 브랜치의 커밋 로그 가져오기
-    await git.fetch();
-    const commitLog = await git.log([`origin/${headBranch}`]);
-
+    const commitLog = await git.log();
     console.log(`Commits in ${headBranch}:`);
     commitLog.all.forEach(commit => {
       console.log(`Commit: ${commit.hash}, Message: ${commit.message}, Author: ${commit.author_name}`);
