@@ -1,18 +1,20 @@
-name: "Trigger on Merge to Specific Branch"
+name: "Run on PR Merge to Main Branch"
 on:
-  push:
+  pull_request:
+    types: [closed]  # PR이 닫힐 때 실행
     branches:
-      - test  # 머지 타겟 브랜치
+      - main  # main 브랜치로 머지될 때만 실행
 
 jobs:
   merge-check:
+    if: github.event.pull_request.merged == true  # PR이 머지된 경우에만 실행
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0  # 전체 커밋 기록을 가져오도록 설정
+          fetch-depth: 0  # 전체 히스토리를 가져오기 위해 0으로 설정
 
       - name: Install dependencies
         run: npm install
