@@ -19,6 +19,8 @@ async function run() {
       const prevCommit = await git.revparse(['HEAD~1']);
       console.log(`Comparing commits ${prevCommit} to ${latestCommit.hash}`);
 
+      console.log('latestCommit : ', latestCommit);
+
       // 두 커밋 간 인터페이스 파일 비교 (예: .ts 파일만 가져오기)
       const interfaceFiles = await git.diffSummary(['--name-only', '--', '*.ts'], prevCommit, latestCommit.hash);
 
