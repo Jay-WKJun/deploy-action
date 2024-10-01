@@ -2,6 +2,8 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const simpleGit = require('simple-git');
 
+console.log('Hello, world!');
+
 async function run() {
   try {
     // Git 인스턴스 생성
