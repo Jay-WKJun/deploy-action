@@ -1,13 +1,11 @@
 name: "Trigger on Merge to Specific Branch"
 on:
-  pull_request:
-    types: [closed]  # PR이 닫힐 때만 실행
+  push:
     branches:
       - test  # 머지 타겟 브랜치
 
 jobs:
   merge-check:
-    if: github.event.pull_request.merged == true  # PR이 머지된 경우에만 실행
     runs-on: ubuntu-latest
 
     steps:
