@@ -16,6 +16,9 @@ jobs:
         with:
           fetch-depth: 0  # 전체 히스토리를 가져오기 위해 0으로 설정
 
+      - name: Fetch all branches
+        run: git fetch --all  # 모든 브랜치의 최신 정보 가져오기
+
       - name: Install dependencies
         run: npm install
 
