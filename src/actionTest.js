@@ -6,31 +6,23 @@ async function run() {
   try {
     const git = simpleGit();
 
-    // 현재 브랜치 정보 확인
-    const pushedBranch = github.context.ref.replace('refs/heads/', '');
-    console.log(`Pushed to branch: ${pushedBranch}`);
+    // GitHub 컨텍스트에서 pull request 정보 가져오기
+    const pullRequest = github.context.payload.pull_request;
 
-    // 최신 커밋 정보 확인
-    const log = await git.log();
-    const latestCommit = log.latest;
+    // 머지 타겟 브랜치와 원본 브랜치 정보 추출
+    const baseBranch = pullRequest.base.ref;  // 머지 타겟 브랜치 (ex: main)
+    const headBranch = pullRequest.head.ref;  // 원본 브랜치 (ex: feature/new-feature)
 
-    // 이전 커밋이 존재하는지 확인 (HEAD~1)
-    if (log.total > 1) {
-      const prevCommit = await git.revparse(['HEAD~1']);
-      console.log(`Comparing commits ${prevCommit} to ${latestCommit.hash}`);
+    console.log(`Merging from branch: ${headBranch} to ${baseBranch}`);
 
-      console.log('latestCommit : ', latestCommit);
+    // 원본 브랜치의 커밋 로그 가져오기
+    await git.fetch();
+    const commitLog = await git.log([`origin/${headBranch}`]);
 
-      // 두 커밋 간 인터페이스 파일 비교 (예: .ts 파일만 가져오기)
-      const interfaceFiles = await git.diffSummary(['--name-only', '--', '*.ts'], prevCommit, latestCommit.hash);
-
-      console.log('Interface files changed:');
-      interfaceFiles.files.forEach(file => {
-        console.log(file.file);
-      });
-    } else {
-      console.log("No previous commit found to compare with.");
-    }
+    console.log(`Commits in ${headBranch}:`);
+    commitLog.all.forEach(commit => {
+      console.log(`Commit: ${commit.hash}, Message: ${commit.message}, Author: ${commit.author_name}`);
+    });
 
   } catch (error) {
     core.setFailed(`Action failed with error: ${error.message}`);
