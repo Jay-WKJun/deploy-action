@@ -13,8 +13,8 @@ async function run() {
     const baseBranch = pullRequest.base.ref;  // 머지 타겟 브랜치 (ex: main)
     console.log(`Current branch: ${baseBranch}`);
 
-    // const headBranch = pullRequest.head.ref;  // 머지 하는 브랜치
-    // console.log(`Current branch: ${headBranch}`);
+    const headBranch = pullRequest.head.ref;  // 머지 하는 브랜치
+    console.log(`Current branch: ${headBranch}`);
 
     // 최신 머지 커밋만 가져오기
     const mergeCommits = await git.log({ '--merges': null, n: 1 });
