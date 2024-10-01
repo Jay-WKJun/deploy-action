@@ -11,21 +11,17 @@ async function run() {
 
     // 머지 타겟 브랜치와 원본 브랜치 정보 추출
     const baseBranch = pullRequest.base.ref;  // 머지 타겟 브랜치 (ex: main)
-    const headBranch = pullRequest.head.ref;  // 원본 브랜치 (ex: feature/new-feature)
+    console.log(`Current branch: ${baseBranch}`);
 
-    console.log(`Merging from branch: ${headBranch} to ${baseBranch}`);
+    // 머지 하는 브랜치 정보 추출
+    const headBranch = pullRequest.head.ref;  // 머지 하는 브랜치
+    console.log(`Current branch: ${headBranch}`);
 
-    // 원본 브랜치 fetch
-    await git.fetch(['origin', headBranch]);
-    // 원본 브랜치 checkout
-    await git.checkout(headBranch);
-    // 원본 브랜치의 커밋 로그 가져오기
-    const commitLog = await git.log();
-    console.log(`Commits in ${headBranch}:`);
-    commitLog.all.forEach(commit => {
-      console.log(`Commit: ${commit.hash}, Message: ${commit.message}, Author: ${commit.author_name}`);
+    // 최신 머지 커밋만 가져오기
+    const mergeCommits = await git.log({ '--merges': null, n: 1 });
+    mergeCommits.all.forEach(commit => {
+      console.log('merged commit : ', commit);
     });
-
   } catch (error) {
     core.setFailed(`Action failed with error: ${error.message}`);
   }
