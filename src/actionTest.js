@@ -2,6 +2,8 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const simpleGit = require('simple-git');
 
+console.log('Hello World!');
+
 async function run() {
   try {
     const git = simpleGit();
