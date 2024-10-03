@@ -11,35 +11,28 @@ async function run() {
     const baseBranch = pullRequest.base.ref;  // 머지 타겟 브랜치 (ex: main)
     const headBranch = pullRequest.head.ref;  // 원본 브랜치
 
-    // 두 브랜치의 최신 커밋 ID 가져오기
+    // 두 브랜치의 최신 커밋 로그 가져오기
     await git.fetch();
-    // const baseBranchCommit = await git.revparse([`origin/${baseBranch}`]);
-    // const headBranchCommit = await git.revparse([`origin/${headBranch}`]);
 
-    const baseBranchLog = await git.log([`origin/${baseBranch}`]);
-    const headBranchLog = await git.log(['HEAD']);
+    // 두 브랜치의 커밋 차이 확인
+    const commitLogs = await git.log([`${baseBranch}..${headBranch}`]);
 
-    const baseBranchCommit = baseBranchLog.latest.hash;
-    const headBranchCommit = headBranchLog.latest.hash;
-
-    // 커밋 ID가 유효한지 확인
-    if (!baseBranchCommit || !headBranchCommit) {
-      throw new Error('Failed to retrieve commit IDs for the branches.');
-    }
-
-    console.log(`Base branch commit: ${baseBranchCommit}`);
-    console.log(`Head branch commit: ${headBranchCommit}`);
-
-    // 두 브랜치 간의 차이 비교 (diff 사용)
-    const diff = await git.diff([`origin/${baseBranch}..HEAD`]);
-    console.log(`Diff: ${diff}`);
-
-    if (!diff) {
+    if (commitLogs.total === 0) {
       console.log(`${headBranch} 브랜치와 ${baseBranch} 브랜치가 동일합니다. BP PR을 생성하지 않습니다.`);
       return;
     }
 
-    console.log(`${diff}개의 커밋 차이가 있습니다. BP PR을 생성합니다.`);
+    console.log(`총 ${commitLogs.total}개의 커밋 차이가 있습니다. 커밋 정보를 출력합니다:`);
+
+    // 각 커밋의 메타 정보 출력
+    commitLogs.all.forEach(commit => {
+      console.log(`-------------------------`);
+      console.log(`Commit hash: ${commit.hash}`);
+      console.log(`Message: ${commit.message}`);
+      console.log(`Author: ${commit.author_name} <${commit.author_email}>`);
+      console.log(`Date: ${commit.date}`);
+    });
+
   } catch (error) {
     core.setFailed(`Action failed with error: ${error.message}`);
   }
