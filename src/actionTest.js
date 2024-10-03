@@ -2,16 +2,14 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const simpleGit = require('simple-git');
 
+console.log('Hello World!');
+
 async function run() {
   try {
     const git = simpleGit();
 
-    // GitHub 컨텍스트에서 필요한 정보 가져오기
+    // GitHub Context에서 PR 정보를 가져옴
     const pullRequest = github.context.payload.pull_request;
-    const baseBranch = pullRequest.base.ref;  // 머지 타겟 브랜치 (ex: main)
-    const headBranch = pullRequest.head.ref;  // 원본 브랜치
-
-    console.log(`Merging from branch: ${headBranch} to ${baseBranch}`);
 
     // 브랜치 존재 여부 확인
     if (!baseBranch || !headBranch) {

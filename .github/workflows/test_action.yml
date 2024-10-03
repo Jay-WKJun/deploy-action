@@ -1,9 +1,9 @@
-name: "Trigger on Merge to Specific Branch"
+name: "Run on PR Merge to Main Branch"
 on:
   pull_request:
     types: [opened, synchronize]  # PR이 열리거나 업데이트될 때 실행
     branches:
-      - test  # 머지 타겟 브랜치
+      - test  # main 브랜치로 머지될 때만 실행
 
 jobs:
   merge-check:
@@ -13,6 +13,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # 전체 히스토리를 가져오기 위해 0으로 설정
+
+      - name: Fetch all branches
+        run: git fetch --all  # 모든 브랜치의 최신 정보 가져오기
 
       - name: Install dependencies
         run: npm install
