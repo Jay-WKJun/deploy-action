@@ -1,9 +1,9 @@
-name: "Run on PR Merge to Main Branch"
+name: "Run on PR Merge to Test Branch"
 on:
   pull_request:
-    types: [opened, synchronize]  # PR이 열리거나 업데이트될 때 실행
+    types: [opened, synchronize]
     branches:
-      - test  # main 브랜치로 머지될 때만 실행
+      - test
 
 jobs:
   diff-check:
@@ -13,13 +13,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0  # 전체 히스토리를 가져오기 위해 0으로 설정
+          fetch-depth: 0
 
       - name: Fetch all branches
-        run: git fetch --all  # 모든 브랜치의 최신 정보 가져오기
+        run: git fetch --all
 
       - name: Install dependencies
         run: npm install
 
-      - name: Run interface comparison
-        run: node src/actionTest.js  # index.js 파일 실행
+      - name: Run git diff comparison
+        run: node dist/index.js
