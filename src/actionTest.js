@@ -32,7 +32,7 @@ async function run() {
     console.log(`Head branch commit: ${headBranchCommit}`);
 
     const diff = git.diff([baseBranchCommit, headBranchCommit]);
-    console.dif(diff);
+    console.dir(diff);
     console.log('diff : ', diff);
 
     // 인터페이스 추출 (예: .ts 파일만 가져오기)
