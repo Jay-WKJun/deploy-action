@@ -1,31 +1,33 @@
-import require$$0 from 'os';
-import require$$0$1 from 'fs';
-import require$$0$a from 'path';
-import require$$2$2 from 'http';
-import require$$3$1 from 'https';
-import require$$0$5 from 'net';
-import require$$1 from 'tls';
-import require$$4$1 from 'events';
-import require$$0$3 from 'assert';
-import require$$0$2 from 'util';
-import require$$0$4 from 'stream';
-import require$$7 from 'buffer';
-import require$$8 from 'querystring';
-import require$$13 from 'stream/web';
-import require$$0$7 from 'node:stream';
-import require$$1$1 from 'node:util';
-import require$$0$6, { EventEmitter } from 'node:events';
-import require$$0$8 from 'worker_threads';
-import require$$2$3 from 'perf_hooks';
-import require$$5 from 'util/types';
-import require$$4$2 from 'async_hooks';
-import require$$1$2 from 'console';
-import require$$1$3 from 'url';
-import require$$3$2 from 'zlib';
-import require$$6 from 'string_decoder';
-import require$$0$9 from 'diagnostics_channel';
-import require$$0$b from 'tty';
-import { spawn } from 'child_process';
+'use strict';
+
+var require$$0 = require('os');
+var require$$0$1 = require('fs');
+var require$$0$a = require('path');
+var require$$2$2 = require('http');
+var require$$3$1 = require('https');
+var require$$0$5 = require('net');
+var require$$1 = require('tls');
+var require$$4$1 = require('events');
+var require$$0$3 = require('assert');
+var require$$0$2 = require('util');
+var require$$0$4 = require('stream');
+var require$$7 = require('buffer');
+var require$$8 = require('querystring');
+var require$$13 = require('stream/web');
+var require$$0$7 = require('node:stream');
+var require$$1$1 = require('node:util');
+var require$$0$6 = require('node:events');
+var require$$0$8 = require('worker_threads');
+var require$$2$3 = require('perf_hooks');
+var require$$5 = require('util/types');
+var require$$4$2 = require('async_hooks');
+var require$$1$2 = require('console');
+var require$$1$3 = require('url');
+var require$$3$2 = require('zlib');
+var require$$6 = require('string_decoder');
+var require$$0$9 = require('diagnostics_channel');
+var require$$0$b = require('tty');
+var child_process = require('child_process');
 
 /******************************************************************************
 Copyright (c) Microsoft Corporation.
@@ -33078,7 +33080,7 @@ var init_git_executor_chain = __esm({
                 rejection = reason || rejection;
               }
             }));
-            const spawned = spawn(command, args, spawnOptions);
+            const spawned = child_process.spawn(command, args, spawnOptions);
             spawned.stdout.on(
               "data",
               onDataReceived(stdOut, "stdOut", logger, outputLogger.step("stdOut"))
@@ -36062,7 +36064,7 @@ init_utils();
 var PluginStore = class {
   constructor() {
     this.plugins = /* @__PURE__ */ new Set();
-    this.events = new EventEmitter();
+    this.events = new require$$0$6.EventEmitter();
   }
   on(type, listener) {
     this.events.on(type, listener);

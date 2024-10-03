@@ -6,7 +6,7 @@ export default {
   input: 'src/index.ts',  // 번들링할 진입 파일 (TypeScript 파일)
   output: {
     file: 'dist/index.js',  // 번들링된 파일을 출력할 경로
-    format: 'es',         // 번들링된 파일의 포맷 (ES Module)
+    format: 'cjs',         // 번들링된 파일의 포맷 (ES Module)
   },
   plugins: [
     nodeResolve(),          // Node.js 모듈을 번들링하기 위해 사용
