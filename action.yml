@@ -1,16 +1,11 @@
-name: 'commit-sort-and-send-slack'
-description: 'sort merged commits in Specific branch & send to slack'
+name: 'pr-git-diff-comment-action'
+description: 'sort merged commits in Specific branch'
 inputs:
-  subscribe-branches : # branch names
-    description: 'Comma-separated list of branches where the action can run'
-    required: true
-    default: 'main'
-  channel-id: # channel id to post message when using bot token
-    description: 'Slack channel ID where message will be posted. Needed if using bot token'
-    required: true
-outputs:
-  sorted-commits:
-    description: 'Sorted commits'
+  GITHUB_TOKEN:
+    description: "The GitHub token for authentication"
+    required: true  # 입력을 필수로 지정
+  GIT_DIFF_COMMENT_TITLE:
+    description: "The title of the comment"
 runs:
   using: 'node20'
   main: 'dist/index.js'
