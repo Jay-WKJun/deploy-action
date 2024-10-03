@@ -36345,6 +36345,8 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         const githubToken = core.getInput('GITHUB_TOKEN');
         const commentTitle = core.getInput('GIT_DIFF_COMMENT_TITLE');
+        console.log('githubToken', githubToken);
+        console.log('commentTitle', commentTitle);
         // git diff를 가져옴
         const gitDiffs = yield getGitDiff();
         if (!gitDiffs)
