@@ -1,21 +1,27 @@
-name: "Trigger on Merge to Specific Branch"
+name: "Run on PR Merge to Test Branch"
 on:
   pull_request:
-    types: [closed]  # PR이 닫힐 때만 실행
+    types: [opened, synchronize]
     branches:
-      - test  # 머지 타겟 브랜치
+      - test
 
 jobs:
-  merge-check:
-    if: github.event.pull_request.merged == true  # PR이 머지된 경우에만 실행
+  diff-check:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Fetch all branches
+        run: git fetch --all
 
       - name: Install dependencies
         run: npm install
 
-      - name: Run interface comparison
-        run: node src/actionTest.js  # index.js 파일 실행
+      - name: Run git diff comparison
+        run: node dist/index.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GITHUB_TOKEN을 환경 변수로 설정
