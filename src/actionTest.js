@@ -6,22 +6,21 @@ async function run() {
   try {
     const git = simpleGit();
 
-    // GitHub 컨텍스트에서 필요한 정보 가져오기
-    const pullRequest = github.context.payload.pull_request;
-    const baseBranch = pullRequest.base.ref;  // 머지 타겟 브랜치 (ex: main)
-    const headBranch = pullRequest.head.ref;  // 원본 브랜치
+    // GitHub Actions에서 사용하는 브랜치 정보 가져오기
+    const currentBranch = github.context.ref.replace('refs/heads/', '');
 
     console.log(`Merging from branch: ${headBranch} to ${baseBranch}`);
 
-    // 브랜치 존재 여부 확인
-    if (!baseBranch || !headBranch) {
-      throw new Error('Base branch or head branch does not exist.');
-    }
-
     // 두 브랜치의 최신 커밋 ID 가져오기
     await git.fetch();
-    const baseBranchCommit = await git.revparse([`origin/${baseBranch}`]);
-    const headBranchCommit = await git.revparse([`origin/${headBranch}`]);
+    // const baseBranchCommit = await git.revparse([`origin/${baseBranch}`]);
+    // const headBranchCommit = await git.revparse([`origin/${headBranch}`]);
+
+    const baseBranchLog = await git.log([`origin/${baseBranch}`]);
+    const headBranchLog = await git.log(['HEAD']);
+
+    const baseBranchCommit = baseBranchLog.latest.hash;
+    const headBranchCommit = headBranchLog.latest.hash;
 
     // 커밋 ID가 유효한지 확인
     if (!baseBranchCommit || !headBranchCommit) {
@@ -31,29 +30,15 @@ async function run() {
     console.log(`Base branch commit: ${baseBranchCommit}`);
     console.log(`Head branch commit: ${headBranchCommit}`);
 
-    const diff = git.log([`origin/${baseBranch}`, "HEAD"]);
-    console.dir(diff);
-    console.log('diff : ', diff);
+    // 두 브랜치 간의 차이 비교 (diff 사용)
+    const diff = await git.diff([`origin/${bpBranch}..HEAD`]);
 
-    // 인터페이스 추출 (예: .ts 파일만 가져오기)
-    const diffSummary = await git.diffSummary([
-      "--name-only",
-      "--",
-      "*.ts"
-    ], `origin/${baseBranch}`, "HEAD");
-    console.dir(diffSummary);
-    console.log('diffSummary : ', diffSummary);
-
-    // 동일한 경우 처리
-    if (!diffSummary.files || diffSummary.files.length === 0) {
-      console.log('No git history was changed between the branches.');
-    } else {
-      console.log('git diff exist');
-      return diffSummary.files.map(file => {
-        console.log('commit : ', file.file);
-        return file.file;
-      });
+    if (!diff) {
+      console.log(`${currentBranch} 브랜치와 ${bpBranch} 브랜치가 동일합니다. BP PR을 생성하지 않습니다.`);
+      return;
     }
+
+    console.log(`${diff}개의 커밋 차이가 있습니다. BP PR을 생성합니다.`);
   } catch (error) {
     core.setFailed(`Action failed with error: ${error.message}`);
   }
