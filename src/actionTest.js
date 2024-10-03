@@ -13,10 +13,11 @@ async function run() {
 
     // 두 브랜치의 최신 커밋 로그 가져오기
     await git.fetch();
+    await git.checkout(baseBranch);
     await git.checkout(headBranch);
 
     // 두 브랜치의 커밋 차이 확인
-    const commitLogs = await git.log([`origin/${baseBranch}..HEAD`]);
+    const commitLogs = await git.log([`${baseBranch}..HEAD`]);
 
     if (commitLogs.total === 0) {
       console.log(`${headBranch} 브랜치와 ${baseBranch} 브랜치가 동일합니다. BP PR을 생성하지 않습니다.`);
@@ -26,14 +27,14 @@ async function run() {
     console.log(`총 ${commitLogs.total}개의 커밋 차이가 있습니다. 커밋 정보를 출력합니다:`);
 
     // 각 커밋의 메타 정보 출력
-    commitLogs.all.forEach(commit => {
+    return commitLogs.all.map(commit => {
       console.log(`-------------------------`);
       console.log(`Commit hash: ${commit.hash}`);
       console.log(`Message: ${commit.message}`);
       console.log(`Author: ${commit.author_name} <${commit.author_email}>`);
       console.log(`Date: ${commit.date}`);
+      return commit;
     });
-
   } catch (error) {
     core.setFailed(`Action failed with error: ${error.message}`);
   }
