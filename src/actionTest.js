@@ -9,8 +9,6 @@ async function run() {
     // GitHub Actions에서 사용하는 브랜치 정보 가져오기
     const currentBranch = github.context.ref.replace('refs/heads/', '');
 
-    console.log(`Merging from branch: ${headBranch} to ${baseBranch}`);
-
     // 두 브랜치의 최신 커밋 ID 가져오기
     await git.fetch();
     // const baseBranchCommit = await git.revparse([`origin/${baseBranch}`]);
