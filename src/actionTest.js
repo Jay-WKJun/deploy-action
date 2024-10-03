@@ -31,10 +31,11 @@ async function run() {
     console.log(`Head branch commit: ${headBranchCommit}`);
 
     // 두 브랜치 간의 차이 비교 (diff 사용)
-    const diff = await git.diff([`origin/${bpBranch}..HEAD`]);
+    const diff = await git.diff([`origin/${baseBranch}..HEAD`]);
+    console.log(`Diff: ${diff}`);
 
     if (!diff) {
-      console.log(`${currentBranch} 브랜치와 ${bpBranch} 브랜치가 동일합니다. BP PR을 생성하지 않습니다.`);
+      console.log(`${headBranch} 브랜치와 ${baseBranch} 브랜치가 동일합니다. BP PR을 생성하지 않습니다.`);
       return;
     }
 
