@@ -6,8 +6,10 @@ async function run() {
   try {
     const git = simpleGit();
 
-    // GitHub Actions에서 사용하는 브랜치 정보 가져오기
-    const currentBranch = github.context.ref.replace('refs/heads/', '');
+    // GitHub 컨텍스트에서 필요한 정보 가져오기
+    const pullRequest = github.context.payload.pull_request;
+    const baseBranch = pullRequest.base.ref;  // 머지 타겟 브랜치 (ex: main)
+    const headBranch = pullRequest.head.ref;  // 원본 브랜치
 
     // 두 브랜치의 최신 커밋 ID 가져오기
     await git.fetch();
