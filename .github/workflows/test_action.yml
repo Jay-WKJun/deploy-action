@@ -6,8 +6,7 @@ on:
       - test  # main 브랜치로 머지될 때만 실행
 
 jobs:
-  merge-check:
-    if: github.event.pull_request.merged == true  # PR이 머지된 경우에만 실행
+  diff-check:
     runs-on: ubuntu-latest
 
     steps:
