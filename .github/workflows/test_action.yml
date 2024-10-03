@@ -1,7 +1,7 @@
 name: "Trigger on Merge to Specific Branch"
 on:
   pull_request:
-    types: [closed]  # PR이 닫힐 때만 실행
+    types: [opened, synchronize]  # PR이 열리거나 업데이트될 때 실행
     branches:
       - test  # 머지 타겟 브랜치
 

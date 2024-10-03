@@ -13,4 +13,4 @@ outputs:
     description: 'Sorted commits'
 runs:
   using: 'node20'
-  main: 'dist/index.js'
+  main: 'dist/git_diff.js'
