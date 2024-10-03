@@ -31,19 +31,25 @@ async function run() {
     console.log(`Base branch commit: ${baseBranchCommit}`);
     console.log(`Head branch commit: ${headBranchCommit}`);
 
+    const diff = git.diff([baseBranchCommit, headBranchCommit]);
+    console.dif(diff);
+    console.log('diff : ', diff);
+
     // 인터페이스 추출 (예: .ts 파일만 가져오기)
-    const diff = await git.diffSummary([
+    const diffSummary = await git.diffSummary([
       "--name-only",
       "--",
       "*.ts"
     ], baseBranchCommit, headBranchCommit);
+    console.dir(diffSummary);
+    console.log('diffSummary : ', diffSummary);
 
     // 동일한 경우 처리
-    if (!diff.files || diff.files.length === 0) {
+    if (!diffSummary.files || diffSummary.files.length === 0) {
       console.log('No git history was changed between the branches.');
     } else {
       console.log('git diff exist');
-      return diff.files.map(file => {
+      return diffSummary.files.map(file => {
         console.log('commit : ', file.file);
         return file.file;
       });
