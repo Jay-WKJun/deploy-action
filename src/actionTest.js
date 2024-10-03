@@ -31,7 +31,7 @@ async function run() {
     console.log(`Base branch commit: ${baseBranchCommit}`);
     console.log(`Head branch commit: ${headBranchCommit}`);
 
-    const diff = git.diff([baseBranchCommit, headBranchCommit]);
+    const diff = git.diff([baseBranch, headBranch]);
     console.dir(diff);
     console.log('diff : ', diff);
 
@@ -40,7 +40,7 @@ async function run() {
       "--name-only",
       "--",
       "*.ts"
-    ], baseBranchCommit, headBranchCommit);
+    ], baseBranch, headBranch);
     console.dir(diffSummary);
     console.log('diffSummary : ', diffSummary);
 
