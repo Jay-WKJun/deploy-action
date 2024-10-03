@@ -13,9 +13,10 @@ async function run() {
 
     // 두 브랜치의 최신 커밋 로그 가져오기
     await git.fetch();
+    await git.checkout(headBranch);
 
     // 두 브랜치의 커밋 차이 확인
-    const commitLogs = await git.log([`${baseBranch}..${headBranch}`]);
+    const commitLogs = await git.log([`origin/${baseBranch}..HEAD`]);
 
     if (commitLogs.total === 0) {
       console.log(`${headBranch} 브랜치와 ${baseBranch} 브랜치가 동일합니다. BP PR을 생성하지 않습니다.`);
