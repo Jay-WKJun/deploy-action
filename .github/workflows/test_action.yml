@@ -25,6 +25,9 @@ jobs:
         run: npm install
 
       - name: create env file & run
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GITHUB_TOKEN을 환경 변수로 설정
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}  # GITHUB_TOKEN을 환경 변수로 설정
         run: |
           echo GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
           echo ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }}
