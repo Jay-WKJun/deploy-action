@@ -26,7 +26,7 @@ jobs:
         run: npm install
 
       - name: Run the action
-        uses: actions/pr-git-diff-comment-action@v1
+        uses: Jay-WKJun/deploy-action@release
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GIT_DIFF_COMMENT_TITLE: "배포 리스트"
