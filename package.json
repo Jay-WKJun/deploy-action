@@ -5,15 +5,19 @@
   "author": "Woo KyungJun",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "build": "rollup -c"
   },
   "license": "ISC",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.0",
     "@rollup/plugin-node-resolve": "^15.3.0",
+    "@types/jest": "^29.5.13",
+    "jest": "^29.7.0",
+    "msw": "^2.4.9",
     "rollup": "^4.24.0",
     "rollup-plugin-typescript2": "^0.36.0",
+    "ts-jest": "^29.2.5",
     "tslib": "^2.7.0",
     "typescript": "^5.6.2"
   },
