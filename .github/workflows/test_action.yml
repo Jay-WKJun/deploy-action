@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write  # 리포지토리에 푸시할 수 있는 권한
+
 jobs:
   diff-check:
     runs-on: ubuntu-latest
