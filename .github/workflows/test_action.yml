@@ -26,6 +26,8 @@ jobs:
 
       - name: create env file & run
         run: |
+          echo GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+          echo ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }}
           touch .env
           echo GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} >> .env
           echo ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }} >> .env
