@@ -36509,12 +36509,13 @@ function upsertCommentInPullRequest(_a) {
 
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        var _a, _b, _c;
+        var _a, _b, _c, _d;
         // const githubToken = core.getInput('GITHUB_TOKEN');
         console.log('process.env', process.env);
         const githubToken = (_a = process.env.GITHUB_TOKEN) !== null && _a !== void 0 ? _a : '';
         const githubRepository = (_b = process.env.GITHUB_REPOSITORY) !== null && _b !== void 0 ? _b : '';
         const githubRef = (_c = process.env.GITHUB_REF) !== null && _c !== void 0 ? _c : '';
+        const prNumber = (_d = githubRef === null || githubRef === void 0 ? void 0 : githubRef.split('/')[2]) !== null && _d !== void 0 ? _d : '';
         // const commentTitle = core.getInput('GIT_DIFF_COMMENT_TITLE');
         console.log('githubToken', githubToken);
         // console.log('commentTitle',commentTitle);
@@ -36527,7 +36528,7 @@ function run() {
         const gitDiffMap = gatherCommitsByEmail(gitDiffs);
         const commentBody = Array.from(gitDiffMap.entries()).map(([email, commits]) => {
             const commitStrings = commits.map(({ author_name, message, hash }) => {
-                return `- [${message} <${author_name}>](https://github.com/${githubRepository}/pull/${githubRef}/${hash})`;
+                return `- [${message}](https://github.com/${githubRepository}/pull/${prNumber}/${hash})`;
             });
             return `### ${email}\n${commitStrings.join('\n')}`;
         }).join('\n\n');

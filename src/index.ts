@@ -10,6 +10,7 @@ async function run() {
   const githubToken = process.env.GITHUB_TOKEN ?? '';
   const githubRepository = process.env.GITHUB_REPOSITORY ?? '';
   const githubRef = process.env.GITHUB_REF ?? '';
+  const prNumber = githubRef?.split('/')[2] ?? '';
   // const commentTitle = core.getInput('GIT_DIFF_COMMENT_TITLE');
   console.log('githubToken',githubToken);
   // console.log('commentTitle',commentTitle);
@@ -24,7 +25,7 @@ async function run() {
   const gitDiffMap = gatherCommitsByEmail(gitDiffs);
   const commentBody = Array.from(gitDiffMap.entries()).map(([email, commits]) => {
     const commitStrings = commits.map(({ author_name, message, hash }) => {
-      return `- [${message} <${author_name}>](https://github.com/${githubRepository}/pull/${githubRef}/${hash})`
+      return `- [${message}](https://github.com/${githubRepository}/pull/${prNumber}/${hash})`
     });
 
     return `### ${email}\n${commitStrings.join('\n')}`
