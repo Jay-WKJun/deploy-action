@@ -20,8 +20,13 @@ async function run() {
 
   // git diff 내용을 이메일 별로 그룹화
   const gitDiffMap = gatherCommitsByEmail(gitDiffs);
-  console.log('gitDiffMap',gitDiffMap);
-  const commentBody = JSON.stringify(Array.from(gitDiffMap.entries()))
+  const commentBody = Array.from(gitDiffMap.entries()).map(([email, commits]) => {
+    const commitStrings = commits.map(({ message, hash }) => {
+      return `- [${message}](${hash})`
+    });
+
+    return `### ${email}\n${commitStrings.join('\n')}`
+  }).join('\n\n');
 
   // git diff를 PR 코멘트로 업데이트
   upsertCommentInPullRequest({
