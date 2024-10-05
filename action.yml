@@ -1,7 +1,7 @@
 name: 'pr-git-diff-comment-action'
 description: 'sort merged commits in Specific branch'
-icons: red
-colos: red
+icon: bar-chart
+color: red
 inputs:
   GITHUB_TOKEN:
     description: "The GitHub token for authentication"
