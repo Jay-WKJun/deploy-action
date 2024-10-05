@@ -17,3 +17,15 @@ export function gatherCommitsByEmail(gitDiffs: Commit[]) {
 
   return commitMap;
 }
+
+export function getCommitUrl(hash: string) {
+  const githubRepository = process.env.GITHUB_REPOSITORY ?? '';
+  const githubRef = process.env.GITHUB_REF ?? '';
+
+  if (!githubRepository || !githubRef) {
+    return hash;
+  }
+
+  const prNumber = githubRef.split('/')?.[2] ?? '';
+  return `https://github.com/${githubRepository}/pull/${prNumber}/commits/${hash}`
+}

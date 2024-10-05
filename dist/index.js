@@ -26,7 +26,7 @@ var require$$1$3 = require('url');
 var require$$3$2 = require('zlib');
 var require$$6 = require('string_decoder');
 var require$$0$9 = require('diagnostics_channel');
-var require$$0$b = require('tty');
+var require$$1$4 = require('tty');
 var child_process = require('child_process');
 
 /******************************************************************************
@@ -31233,6 +31233,165 @@ function requireBrowser () {
 
 var node = {exports: {}};
 
+var hasFlag;
+var hasRequiredHasFlag;
+
+function requireHasFlag () {
+	if (hasRequiredHasFlag) return hasFlag;
+	hasRequiredHasFlag = 1;
+
+	hasFlag = (flag, argv = process.argv) => {
+		const prefix = flag.startsWith('-') ? '' : (flag.length === 1 ? '-' : '--');
+		const position = argv.indexOf(prefix + flag);
+		const terminatorPosition = argv.indexOf('--');
+		return position !== -1 && (terminatorPosition === -1 || position < terminatorPosition);
+	};
+	return hasFlag;
+}
+
+var supportsColor_1;
+var hasRequiredSupportsColor;
+
+function requireSupportsColor () {
+	if (hasRequiredSupportsColor) return supportsColor_1;
+	hasRequiredSupportsColor = 1;
+	const os = require$$0;
+	const tty = require$$1$4;
+	const hasFlag = requireHasFlag();
+
+	const {env} = process;
+
+	let forceColor;
+	if (hasFlag('no-color') ||
+		hasFlag('no-colors') ||
+		hasFlag('color=false') ||
+		hasFlag('color=never')) {
+		forceColor = 0;
+	} else if (hasFlag('color') ||
+		hasFlag('colors') ||
+		hasFlag('color=true') ||
+		hasFlag('color=always')) {
+		forceColor = 1;
+	}
+
+	if ('FORCE_COLOR' in env) {
+		if (env.FORCE_COLOR === 'true') {
+			forceColor = 1;
+		} else if (env.FORCE_COLOR === 'false') {
+			forceColor = 0;
+		} else {
+			forceColor = env.FORCE_COLOR.length === 0 ? 1 : Math.min(parseInt(env.FORCE_COLOR, 10), 3);
+		}
+	}
+
+	function translateLevel(level) {
+		if (level === 0) {
+			return false;
+		}
+
+		return {
+			level,
+			hasBasic: true,
+			has256: level >= 2,
+			has16m: level >= 3
+		};
+	}
+
+	function supportsColor(haveStream, streamIsTTY) {
+		if (forceColor === 0) {
+			return 0;
+		}
+
+		if (hasFlag('color=16m') ||
+			hasFlag('color=full') ||
+			hasFlag('color=truecolor')) {
+			return 3;
+		}
+
+		if (hasFlag('color=256')) {
+			return 2;
+		}
+
+		if (haveStream && !streamIsTTY && forceColor === undefined) {
+			return 0;
+		}
+
+		const min = forceColor || 0;
+
+		if (env.TERM === 'dumb') {
+			return min;
+		}
+
+		if (process.platform === 'win32') {
+			// Windows 10 build 10586 is the first Windows release that supports 256 colors.
+			// Windows 10 build 14931 is the first release that supports 16m/TrueColor.
+			const osRelease = os.release().split('.');
+			if (
+				Number(osRelease[0]) >= 10 &&
+				Number(osRelease[2]) >= 10586
+			) {
+				return Number(osRelease[2]) >= 14931 ? 3 : 2;
+			}
+
+			return 1;
+		}
+
+		if ('CI' in env) {
+			if (['TRAVIS', 'CIRCLECI', 'APPVEYOR', 'GITLAB_CI', 'GITHUB_ACTIONS', 'BUILDKITE'].some(sign => sign in env) || env.CI_NAME === 'codeship') {
+				return 1;
+			}
+
+			return min;
+		}
+
+		if ('TEAMCITY_VERSION' in env) {
+			return /^(9\.(0*[1-9]\d*)\.|\d{2,}\.)/.test(env.TEAMCITY_VERSION) ? 1 : 0;
+		}
+
+		if (env.COLORTERM === 'truecolor') {
+			return 3;
+		}
+
+		if ('TERM_PROGRAM' in env) {
+			const version = parseInt((env.TERM_PROGRAM_VERSION || '').split('.')[0], 10);
+
+			switch (env.TERM_PROGRAM) {
+				case 'iTerm.app':
+					return version >= 3 ? 3 : 2;
+				case 'Apple_Terminal':
+					return 2;
+				// No default
+			}
+		}
+
+		if (/-256(color)?$/i.test(env.TERM)) {
+			return 2;
+		}
+
+		if (/^screen|^xterm|^vt100|^vt220|^rxvt|color|ansi|cygwin|linux/i.test(env.TERM)) {
+			return 1;
+		}
+
+		if ('COLORTERM' in env) {
+			return 1;
+		}
+
+		return min;
+	}
+
+	function getSupportLevel(stream) {
+		const level = supportsColor(stream, stream && stream.isTTY);
+		return translateLevel(level);
+	}
+
+	supportsColor_1 = {
+		supportsColor: getSupportLevel,
+		stdout: translateLevel(supportsColor(true, tty.isatty(1))),
+		stderr: translateLevel(supportsColor(true, tty.isatty(2)))
+	};
+	return supportsColor_1;
+}
+
 /**
  * Module dependencies.
  */
@@ -31243,7 +31402,7 @@ function requireNode () {
 	if (hasRequiredNode) return node.exports;
 	hasRequiredNode = 1;
 	(function (module, exports) {
-		const tty = require$$0$b;
+		const tty = require$$1$4;
 		const util = require$$0$2;
 
 		/**
@@ -31270,7 +31429,7 @@ function requireNode () {
 		try {
 			// Optional dependency (as in, doesn't need to be installed, NOT like optionalDependencies in package.json)
 			// eslint-disable-next-line import/no-extraneous-dependencies
-			const supportsColor = require('supports-color');
+			const supportsColor = requireSupportsColor();
 
 			if (supportsColor && (supportsColor.stderr || supportsColor).level >= 2) {
 				exports.colors = [
@@ -36294,9 +36453,26 @@ function getGitDiff() {
 function gatherCommitsByEmail(gitDiffs) {
     const commitMap = new Map();
     gitDiffs.forEach((commit) => {
-        commitMap.set(commit.author_email, commit);
+        const { author_email } = commit;
+        const commits = commitMap.get(author_email);
+        if (!commits) {
+            commitMap.set(author_email, [commit]);
+        }
+        else {
+            commitMap.set(author_email, [...commits, commit]);
+        }
     });
     return commitMap;
+}
+function getCommitUrl(hash) {
+    var _a, _b, _c, _d;
+    const githubRepository = (_a = process.env.GITHUB_REPOSITORY) !== null && _a !== void 0 ? _a : '';
+    const githubRef = (_b = process.env.GITHUB_REF) !== null && _b !== void 0 ? _b : '';
+    if (!githubRepository || !githubRef) {
+        return hash;
+    }
+    const prNumber = (_d = (_c = githubRef.split('/')) === null || _c === void 0 ? void 0 : _c[2]) !== null && _d !== void 0 ? _d : '';
+    return `https://github.com/${githubRepository}/pull/${prNumber}/commits/${hash}`;
 }
 
 function upsertCommentInPullRequest(_a) {
@@ -36343,22 +36519,39 @@ function upsertCommentInPullRequest(_a) {
 
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        const githubToken = core.getInput('GITHUB_TOKEN');
-        const commentTitle = core.getInput('GIT_DIFF_COMMENT_TITLE');
-        console.log('githubToken', githubToken);
-        console.log('commentTitle', commentTitle);
-        // git diff를 가져옴
-        const gitDiffs = yield getGitDiff();
-        if (!gitDiffs)
+        // GitHub 이벤트 이름을 가져옴
+        const eventName = github.context.eventName;
+        // 이벤트가 pull_request인지 확인
+        if (eventName !== 'pull_request') {
+            core.setFailed('This action only runs on pull requests event.');
             return;
-        // git diff 내용을 이메일 별로 그룹화
-        const gitDiffMap = gatherCommitsByEmail(gitDiffs);
-        // git diff를 PR 코멘트로 업데이트
-        upsertCommentInPullRequest({
-            githubToken,
-            commentBody: JSON.stringify(gitDiffMap),
-            commentTitle,
-        });
+        }
+        try {
+            const githubToken = core.getInput('GITHUB_TOKEN');
+            const commentTitle = core.getInput('GIT_DIFF_COMMENT_TITLE');
+            // git diff를 가져옴
+            const gitDiffs = yield getGitDiff();
+            if (!gitDiffs)
+                return;
+            // git diff 내용을 이메일 별로 그룹화
+            const gitDiffMap = gatherCommitsByEmail(gitDiffs);
+            const commentBody = Array.from(gitDiffMap.entries()).map(([email, commits]) => {
+                const commitStrings = commits.map(({ message, hash }) => {
+                    return `- [${message}](${getCommitUrl(hash)})`;
+                });
+                const authorName = commits[0].author_name;
+                return `### ${email} <${authorName}>\n${commitStrings.join('\n')}`;
+            }).join('\n\n');
+            // git diff를 PR 코멘트로 업데이트
+            upsertCommentInPullRequest({
+                githubToken,
+                commentBody,
+                commentTitle,
+            });
+        }
+        catch (error) {
+            core.setFailed(`Action failed with error: ${error === null || error === void 0 ? void 0 : error.message}`);
+        }
     });
 }
 run();

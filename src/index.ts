@@ -1,31 +1,47 @@
 import core from '@actions/core';
+import github from '@actions/github';
 import { getGitDiff } from "./git_diff";
-import { gatherCommitsByEmail } from "./utils";
+import { gatherCommitsByEmail, getCommitUrl } from "./utils";
 import { upsertCommentInPullRequest } from './github';
 
 async function run() {
-  // const githubToken = core.getInput('GITHUB_TOKEN');
-  console.log('process.env', process.env);
-  const githubToken = process.env.GITHUB_TOKEN ?? '';
-  // const commentTitle = core.getInput('GIT_DIFF_COMMENT_TITLE');
-  console.log('githubToken',githubToken);
-  // console.log('commentTitle',commentTitle);
+  // GitHub 이벤트 이름을 가져옴
+  const eventName = github.context.eventName;
 
-  console.log('accessToken : ', process.env.ACCESS_TOKEN);
+  // 이벤트가 pull_request인지 확인
+  if (eventName !== 'pull_request') {
+    core.setFailed('This action only runs on pull requests event.');
+    return;
+  }
 
-  // git diff를 가져옴
-  const gitDiffs = await getGitDiff();
-  if (!gitDiffs) return;
+  try {
+    const githubToken = core.getInput('GITHUB_TOKEN');
+    const commentTitle = core.getInput('GIT_DIFF_COMMENT_TITLE');
 
-  // git diff 내용을 이메일 별로 그룹화
-  const gitDiffMap = gatherCommitsByEmail(gitDiffs);
+    // git diff를 가져옴
+    const gitDiffs = await getGitDiff();
+    if (!gitDiffs) return;
 
-  // git diff를 PR 코멘트로 업데이트
-  upsertCommentInPullRequest({
-    githubToken,
-    commentBody: JSON.stringify(gitDiffMap),
-    commentTitle: '추가됨',
-  });
+    // git diff 내용을 이메일 별로 그룹화
+    const gitDiffMap = gatherCommitsByEmail(gitDiffs);
+    const commentBody = Array.from(gitDiffMap.entries()).map(([email, commits]) => {
+      const commitStrings = commits.map(({ message, hash }) => {
+        return `- [${message}](${getCommitUrl(hash)})`
+      });
+
+      const authorName = commits[0].author_name;
+      return `### ${email} <${authorName}>\n${commitStrings.join('\n')}`
+    }).join('\n\n');
+
+    // git diff를 PR 코멘트로 업데이트
+    upsertCommentInPullRequest({
+      githubToken,
+      commentBody,
+      commentTitle,
+    });
+  } catch (error: any) {
+    core.setFailed(`Action failed with error: ${error?.message}`);
+  }
 }
 
 run();
