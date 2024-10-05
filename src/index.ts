@@ -4,7 +4,8 @@ import { gatherCommitsByEmail } from "./utils";
 import { upsertCommentInPullRequest } from './github';
 
 async function run() {
-  const githubToken = core.getInput('GITHUB_TOKEN');
+  // const githubToken = core.getInput('GITHUB_TOKEN');
+  const githubToken = process.env.GITHUB_TOKEN ?? '';
   const commentTitle = core.getInput('GIT_DIFF_COMMENT_TITLE');
   console.log('githubToken',githubToken);
   console.log('commentTitle',commentTitle);
