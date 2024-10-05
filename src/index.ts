@@ -4,7 +4,7 @@ import { gatherCommitsByEmail } from "./utils";
 import { upsertCommentInPullRequest } from './github';
 
 async function run() {
-  
+
   // const githubToken = core.getInput('GITHUB_TOKEN');
   console.log('process.env', process.env);
   const githubToken = process.env.GITHUB_TOKEN ?? '';
@@ -24,7 +24,7 @@ async function run() {
   // git diff를 PR 코멘트로 업데이트
   upsertCommentInPullRequest({
     githubToken,
-    commentBody: JSON.stringify(gitDiffMap),
+    commentBody: JSON.stringify(Object(gitDiffMap)),
     commentTitle: '추가됨',
   });
 }

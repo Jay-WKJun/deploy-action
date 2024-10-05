@@ -36526,7 +36526,7 @@ function run() {
         // git diff를 PR 코멘트로 업데이트
         upsertCommentInPullRequest({
             githubToken,
-            commentBody: JSON.stringify(gitDiffMap),
+            commentBody: JSON.stringify(Object(gitDiffMap)),
             commentTitle: '추가됨',
         });
     });
