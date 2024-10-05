@@ -24,6 +24,12 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: create env file
+        run: |
+          touch .env
+          echo GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} >> .env
+          echo ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }} >> .env
+
       - name: Run git diff comparison
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GITHUB_TOKEN을 환경 변수로 설정

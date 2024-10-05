@@ -5,10 +5,12 @@ import { upsertCommentInPullRequest } from './github';
 
 async function run() {
   // const githubToken = core.getInput('GITHUB_TOKEN');
-  const githubToken = process.env.ACCESS_TOKEN ?? '';
+  const githubToken = process.env.GITHUB_TOKEN ?? '';
   const commentTitle = core.getInput('GIT_DIFF_COMMENT_TITLE');
   console.log('githubToken',githubToken);
   console.log('commentTitle',commentTitle);
+
+  console.log('accessToken : ', process.env.ACCESS_TOKEN);
 
   // git diff를 가져옴
   const gitDiffs = await getGitDiff();
