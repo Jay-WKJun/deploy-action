@@ -8,6 +8,8 @@ async function run() {
   // const githubToken = core.getInput('GITHUB_TOKEN');
   console.log('process.env', process.env);
   const githubToken = process.env.GITHUB_TOKEN ?? '';
+  const githubRepository = process.env.GITHUB_REPOSITORY ?? '';
+  const githubRef = process.env.GITHUB_REF ?? '';
   // const commentTitle = core.getInput('GIT_DIFF_COMMENT_TITLE');
   console.log('githubToken',githubToken);
   // console.log('commentTitle',commentTitle);
@@ -21,8 +23,8 @@ async function run() {
   // git diff 내용을 이메일 별로 그룹화
   const gitDiffMap = gatherCommitsByEmail(gitDiffs);
   const commentBody = Array.from(gitDiffMap.entries()).map(([email, commits]) => {
-    const commitStrings = commits.map(({ message, hash }) => {
-      return `- [${message}](${hash})`
+    const commitStrings = commits.map(({ author_name, message, hash }) => {
+      return `- [${message} <${author_name}>](https://github.com/${githubRepository}/pull/${githubRef}/${hash})`
     });
 
     return `### ${email}\n${commitStrings.join('\n')}`
