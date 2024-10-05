@@ -5,10 +5,11 @@ import { upsertCommentInPullRequest } from './github';
 
 async function run() {
   // const githubToken = core.getInput('GITHUB_TOKEN');
+  console.log('process.env', process.env);
   const githubToken = process.env.GITHUB_TOKEN ?? '';
-  const commentTitle = core.getInput('GIT_DIFF_COMMENT_TITLE');
+  // const commentTitle = core.getInput('GIT_DIFF_COMMENT_TITLE');
   console.log('githubToken',githubToken);
-  console.log('commentTitle',commentTitle);
+  // console.log('commentTitle',commentTitle);
 
   console.log('accessToken : ', process.env.ACCESS_TOKEN);
 
@@ -23,7 +24,7 @@ async function run() {
   upsertCommentInPullRequest({
     githubToken,
     commentBody: JSON.stringify(gitDiffMap),
-    commentTitle,
+    commentTitle: '추가됨',
   });
 }
 
