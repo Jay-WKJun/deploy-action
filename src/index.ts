@@ -4,6 +4,7 @@ import { gatherCommitsByEmail } from "./utils";
 import { upsertCommentInPullRequest } from './github';
 
 async function run() {
+  
   // const githubToken = core.getInput('GITHUB_TOKEN');
   console.log('process.env', process.env);
   const githubToken = process.env.GITHUB_TOKEN ?? '';
