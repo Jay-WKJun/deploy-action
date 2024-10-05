@@ -36528,9 +36528,10 @@ function run() {
         const gitDiffMap = gatherCommitsByEmail(gitDiffs);
         const commentBody = Array.from(gitDiffMap.entries()).map(([email, commits]) => {
             const commitStrings = commits.map(({ author_name, message, hash }) => {
-                return `- [${message}](https://github.com/${githubRepository}/pull/${prNumber}/${hash})`;
+                return `- [${message}](https://github.com/${githubRepository}/pull/${prNumber}/commits/${hash})`;
             });
-            return `### ${email}\n${commitStrings.join('\n')}`;
+            const authorName = commits[0].author_name;
+            return `### ${email} <${authorName}>\n${commitStrings.join('\n')}`;
         }).join('\n\n');
         // git diff를 PR 코멘트로 업데이트
         upsertCommentInPullRequest({
