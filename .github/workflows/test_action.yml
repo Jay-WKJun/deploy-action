@@ -27,4 +27,5 @@ jobs:
       - name: Run git diff comparison
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GITHUB_TOKEN을 환경 변수로 설정
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}  # GITHUB_TOKEN을 환경 변수로 설정
         run: node dist/index.js
