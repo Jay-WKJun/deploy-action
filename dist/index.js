@@ -36464,6 +36464,16 @@ function gatherCommitsByEmail(gitDiffs) {
     });
     return commitMap;
 }
+function getCommitUrl(hash) {
+    var _a, _b, _c, _d;
+    const githubRepository = (_a = process.env.GITHUB_REPOSITORY) !== null && _a !== void 0 ? _a : '';
+    const githubRef = (_b = process.env.GITHUB_REF) !== null && _b !== void 0 ? _b : '';
+    if (!githubRepository || !githubRef) {
+        return hash;
+    }
+    const prNumber = (_d = (_c = githubRef.split('/')) === null || _c === void 0 ? void 0 : _c[2]) !== null && _d !== void 0 ? _d : '';
+    return `https://github.com/${githubRepository}/pull/${prNumber}/commits/${hash}`;
+}
 
 function upsertCommentInPullRequest(_a) {
     return __awaiter(this, arguments, void 0, function* ({ commentBody, commentTitle = 'Generated Comment', githubToken, }) {
@@ -36509,36 +36519,39 @@ function upsertCommentInPullRequest(_a) {
 
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        var _a, _b, _c, _d;
-        // const githubToken = core.getInput('GITHUB_TOKEN');
-        console.log('process.env', process.env);
-        const githubToken = (_a = process.env.GITHUB_TOKEN) !== null && _a !== void 0 ? _a : '';
-        const githubRepository = (_b = process.env.GITHUB_REPOSITORY) !== null && _b !== void 0 ? _b : '';
-        const githubRef = (_c = process.env.GITHUB_REF) !== null && _c !== void 0 ? _c : '';
-        const prNumber = (_d = githubRef === null || githubRef === void 0 ? void 0 : githubRef.split('/')[2]) !== null && _d !== void 0 ? _d : '';
-        // const commentTitle = core.getInput('GIT_DIFF_COMMENT_TITLE');
-        console.log('githubToken', githubToken);
-        // console.log('commentTitle',commentTitle);
-        console.log('accessToken : ', process.env.ACCESS_TOKEN);
-        // git diff를 가져옴
-        const gitDiffs = yield getGitDiff();
-        if (!gitDiffs)
+        // GitHub 이벤트 이름을 가져옴
+        const eventName = github.context.eventName;
+        // 이벤트가 pull_request인지 확인
+        if (eventName !== 'pull_request') {
+            core.setFailed('This action only runs on pull requests event.');
             return;
-        // git diff 내용을 이메일 별로 그룹화
-        const gitDiffMap = gatherCommitsByEmail(gitDiffs);
-        const commentBody = Array.from(gitDiffMap.entries()).map(([email, commits]) => {
-            const commitStrings = commits.map(({ author_name, message, hash }) => {
-                return `- [${message}](https://github.com/${githubRepository}/pull/${prNumber}/commits/${hash})`;
+        }
+        try {
+            const githubToken = core.getInput('GITHUB_TOKEN');
+            const commentTitle = core.getInput('GIT_DIFF_COMMENT_TITLE');
+            // git diff를 가져옴
+            const gitDiffs = yield getGitDiff();
+            if (!gitDiffs)
+                return;
+            // git diff 내용을 이메일 별로 그룹화
+            const gitDiffMap = gatherCommitsByEmail(gitDiffs);
+            const commentBody = Array.from(gitDiffMap.entries()).map(([email, commits]) => {
+                const commitStrings = commits.map(({ message, hash }) => {
+                    return `- [${message}](${getCommitUrl(hash)})`;
+                });
+                const authorName = commits[0].author_name;
+                return `### ${email} <${authorName}>\n${commitStrings.join('\n')}`;
+            }).join('\n\n');
+            // git diff를 PR 코멘트로 업데이트
+            upsertCommentInPullRequest({
+                githubToken,
+                commentBody,
+                commentTitle,
             });
-            const authorName = commits[0].author_name;
-            return `### ${email} <${authorName}>\n${commitStrings.join('\n')}`;
-        }).join('\n\n');
-        // git diff를 PR 코멘트로 업데이트
-        upsertCommentInPullRequest({
-            githubToken,
-            commentBody,
-            commentTitle: '추가됨',
-        });
+        }
+        catch (error) {
+            core.setFailed(`Action failed with error: ${error === null || error === void 0 ? void 0 : error.message}`);
+        }
     });
 }
 run();
